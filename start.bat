@@ -1,0 +1,1 @@
+cd public && yarn start

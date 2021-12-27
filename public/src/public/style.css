@@ -1,0 +1,178 @@
+body {
+    height: 100%;
+    width: 100%;
+
+    background-color: #1c1c1c;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    display: grid;
+    place-items: center;
+}
+
+.container {
+    display: grid;
+    place-items: center;
+}
+
+.middle {
+    text-align: center;
+
+    width: 500px;
+}
+
+.search-bar {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 24px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #eeeeee;
+    background-color: #1c1c1c;
+
+    cursor: pointer;
+}
+
+
+.search-btn {
+    flex: 1;
+    background-color: transparent;
+    border: none;
+
+    border-right: solid;
+    border-color: #eeeeee;
+    border-width: 1px;
+
+    height: 24px;
+    width: 24px;
+
+    filter: opacity(70%);
+}
+
+.open-img-btn {
+    flex: 1;
+    background-color: transparent;
+    border: none;
+
+    border-left: solid;
+    border-color: #eeeeee;
+    border-width: 1px;
+
+    height: 24px;
+    width: 24px;
+
+    filter: opacity(70%);
+}
+
+
+.input {
+    flex: 10;
+
+    width: 100%;
+    height: 40px;
+
+    color: #eeeeee;
+    border: none;
+
+    padding-left: 20px;
+
+    background-color: transparent;
+}
+
+.input:focus {
+    outline: none;
+}
+
+.search-bar:hover {
+    background-color: #333333;
+}
+
+.image-container {
+    width: 100%;
+    
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    text-align: center;
+}
+
+.img_div {
+    position: relative;
+    width: 200px;
+    height: 200px;
+
+    margin: 10px;
+
+    text-align: center;
+}
+
+.res-img {
+    width: 100%;
+    height: 100%;
+
+    border-radius: 10px;
+}
+
+.tbg {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 30px;
+    background-color: #45c0c9d5;
+
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+
+    
+    display: grid;
+    place-items: center;
+    
+    overflow: hidden;
+
+
+
+}
+
+.img-name {
+    position: absolute;
+
+    
+    color: black;
+    width: 100%;
+
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+}
+
+.overlay:hover {
+    cursor: pointer;
+
+    animation-name: darken;
+    animation-duration: .5s;
+
+    background-color: #1c1c1c44;
+}
+
+@keyframes darken {
+    0% { background-color: transparent; }
+    100% { background-color: #1c1c1c44; }
+}
+
+
+@keyframes smoothopacity {
+    0% { opacity: 100%; }
+    100% { opacity: 50%; }
+}
