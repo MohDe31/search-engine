@@ -1,0 +1,1 @@
+gcc -shared -o libdct.so -fPIC dct.c

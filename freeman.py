@@ -1,6 +1,17 @@
 from PIL import Image
 import numpy as np
+import cv2
 
+
+
+img = cv2.imread('download.jpg')
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+blur = cv2.GaussianBlur(gray, (5, 5), 3)
+canny = cv2.Canny(blur, 50, 50)
+
+cv2.imwrite('out.jpg', canny)
+
+exit()
 image = np.array(Image.open('gear.jpg'))
 image[image <  100] = 0
 image[image >= 100] = 255
@@ -70,5 +81,4 @@ def build_contour(idx, contour, img):
         
     Image.fromarray(arr.astype("uint8")).save("image.png")
 
-build_contour(start_pos, contour, image)
-
+# build_contour(start_pos, contour, image)

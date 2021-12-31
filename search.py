@@ -4,10 +4,15 @@ from threading import Thread
 from bs4.element import Tag
 from io import BytesIO
 from PIL import Image
+
 import numpy as np
 import requests
 import sqlite3
 import base64
+import cv2
+import os
+
+from ctest import compare
 
 def save_urls(link, images): 
     db = sqlite3.connect('database.db')
@@ -37,11 +42,25 @@ def url_tob64(url):
 def b64_to_image(b64):
     im_bytes = base64.b64decode(b64)
     im_file  = BytesIO(im_bytes)
-    return np.array(Image.open(im_file))
+    return cv2.cvtColor(np.array(Image.open(im_file)), cv2.COLOR_RGB2BGR)
 
 def searchForImage(value: str):
     img = b64_to_image(value)
-    print(img)
+    assets_folder = os.path.join(os.getcwd(), "assets")
+    images = []
+    for filename in os.listdir(assets_folder):
+        file_path = os.path.join(assets_folder, filename)
+
+        test_img = cv2.imread(file_path)
+
+        dist = compare(img, test_img)
+
+        if dist <= 400:
+            with open(file_path, 'rb') as f:
+                b64 = base64.b64encode(f.read())
+                images.append(b64, dist)
+
+    return sorted(images, key=lambda x:x[1])
 
 def searchFor(value: str):
     db_connection: Connection = sqlite3.connect('database.db')
