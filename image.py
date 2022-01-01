@@ -100,7 +100,7 @@ def DCT(img):
     
     img -= 128
 
-    xs, ys = np.where(img[...,0])
+    xs, ys = np.where(np.ones((w,h)))
     xs = xs.reshape((w, h))
     ys = ys.reshape((w, h))
 
@@ -120,15 +120,3 @@ def DCT(img):
             dct[p, q, 2] = (ap * aq * np.sum(cosx * cosy * block[..., 2])) / Q[p, q]
 
     return zigzag_scan(dct)
-    
-
-
-img1 = np.array(Image.open("mount.jpg"))
-img2 = np.array(Image.open("mount2.jpg"))
-
-y1, cb1, cr1 = DCT(img1)
-y2, cb2, cr2 = DCT(img2)
-
-D = ((((y1-y2)**2).sum())**.5) + ((((cb1-cb2)**2).sum())**.5) + ((((cr1-cr2)**2).sum())**.5)
-
-print(D)

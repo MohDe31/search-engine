@@ -24,7 +24,7 @@ async function searchImage(file) {
 
     const fileReader = new FileReader();
     fileReader.onload = async () => {
-        console.log(fileReader.result);
+        // console.log(fileReader.result);
         const response = await fetch('http://127.0.0.1:5000', {
             method: 'POST',
             headers: { 
@@ -36,7 +36,12 @@ async function searchImage(file) {
             })
         });
 
-        console.log(await response.json());
+        const data = await response.json();
+
+        if(data.success){
+            const imageArray = data.data;
+            addImages(imageArray);
+        }
     }
     fileReader.readAsDataURL(file);
 }

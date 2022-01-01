@@ -12,7 +12,9 @@ import base64
 import cv2
 import os
 
-from ctest import compare
+from freeman import compare, compare_ci, freeman
+from image import DCT
+from utils import isGray
 
 def save_urls(link, images): 
     db = sqlite3.connect('database.db')
@@ -46,21 +48,46 @@ def b64_to_image(b64):
 
 def searchForImage(value: str):
     img = b64_to_image(value)
+    
     assets_folder = os.path.join(os.getcwd(), "assets")
-    images = []
-    for filename in os.listdir(assets_folder):
-        file_path = os.path.join(assets_folder, filename)
 
-        test_img = cv2.imread(file_path)
+    if isGray(img):
+        print("FREEMAN")
+        img_freeman = freeman(img)
+        images = []
+        for filename in os.listdir(assets_folder):
+            file_path = os.path.join(assets_folder, filename)
+            print(file_path)
+            test_img = cv2.imread(file_path)
 
-        dist = compare(img, test_img)
+            dist = compare_ci(img_freeman, test_img)
 
-        if dist <= 400:
-            with open(file_path, 'rb') as f:
-                b64 = base64.b64encode(f.read())
-                images.append(b64, dist)
+            if dist <= 400:
+                with open(file_path, 'rb') as f:
+                    b64 = base64.b64encode(f.read())
+                    images.append({'src': str(b64)[2:-1], 'type': 'B64', 'name': filename, 'dist': dist})
+                    
+        return sorted(images, key=lambda x:x['dist'])
+    else:
+        print("DCT")
+        y1, cb1, cr1 = DCT(img)
 
-    return sorted(images, key=lambda x:x[1])
+        images = []
+        for filename in os.listdir(assets_folder):
+            file_path = os.path.join(assets_folder, filename)
+            print(file_path)
+            test_img = cv2.imread(file_path)
+
+            y2, cb2, cr2 = DCT(test_img)
+            
+            dist = ((((y1-y2)**2).sum())**.5) + ((((cb1-cb2)**2).sum())**.5) + ((((cr1-cr2)**2).sum())**.5)
+            print(dist)
+            if dist <= 2000:
+                with open(file_path, 'rb') as f:
+                    b64 = base64.b64encode(f.read())
+                    images.append({'src': str(b64)[2:-1], 'type': 'B64', 'name': filename, 'dist': dist})
+                    
+        return sorted(images, key=lambda x:x['dist'])
 
 def searchFor(value: str):
     db_connection: Connection = sqlite3.connect('database.db')

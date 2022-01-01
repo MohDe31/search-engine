@@ -12,6 +12,7 @@ window.onload = () => {
 
     inputContainer.onchange = (e)=> {
         const file = e.target.files[0];
+        imageContainer.innerHTML = '';
         e.target.value = "";
         searchImage(file);
     }

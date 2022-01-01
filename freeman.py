@@ -1,84 +1,54 @@
-from PIL import Image
+from ctypes import *
+import ctypes
 import numpy as np
+from PIL import Image
 import cv2
+from numpy.ctypeslib import as_ctypes, load_library
+libCalc = CDLL("./utils/libdct.so")
 
+def Naif_Detector(image):
+    vertical = abs(image[:, 0: -1] - image[:, 1:])
+    horizontal = abs(image[0: -1, :] - image[1:, :])
+    contour = np.sqrt(vertical[:-1,:]**2 + horizontal[:,:-1]**2)
+    np.putmask(contour, contour > 255, 255)
+    return contour
 
+def process_img(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(gray, (3, 3), 0)
+    binary = (blur < 127) * 255
+    return Naif_Detector(binary)
 
-img = cv2.imread('download.jpg')
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-blur = cv2.GaussianBlur(gray, (5, 5), 3)
-canny = cv2.Canny(blur, 50, 50)
+def get_chaine(img):
 
-cv2.imwrite('out.jpg', canny)
+    # Create an image pointer
+    img_c  = img.astype(np.int32).ctypes.data_as(ctypes.POINTER(ctypes.c_int32))
 
-exit()
-image = np.array(Image.open('gear.jpg'))
-image[image <  100] = 0
-image[image >= 100] = 255
+    # Create a pointer
+    freeman_c= np.zeros((int(1e9),), dtype=np.int16).ctypes.data_as(ctypes.POINTER(ctypes.c_int16))
 
+    h, w = img.shape
 
-start = [*zip(*np.where(image == 255)),][0]
+    size = libCalc.freeman(img_c, freeman_c, w, h, 0)
 
-
-#3 2 1
-#4 X 0
-#5 6 7
-
-direction = 4
-
-dir_idx = [* zip(
-    [1, 1, 0, -1, -1, -1, 0, 1],
-    [0, 1, 1, 1, 0, -1, -1, -1]
-) ,]
-
-contour = []
-start_pos = start
-
-def start_chain(img, idx, direction):
-    global dir_idx, contour, start_pos
-
-    print(idx)
-
-    x, y = idx
+    chaine = np.ctypeslib.as_array(freeman_c, (size,)).astype(np.int16)
     
-    loop_start_dir = direction
+    return [*map(lambda x:[*map(int,x.strip().split()),],' '.join(map(str,chaine)).split('-1')),]
 
-    while(True):
-        xd, yd = dir_idx[direction]
-        if (img[x+xd, y+yd]):
-            sx, sy = start_pos
-            if x+xd == sx and y+yd == sy:
-                return
-            
-            contour += [direction]
+def freeman(img):
+    img = process_img(img).astype("uint8")
 
-            start_chain(img, (x+xd, y+yd), (direction-5)%8)
-            return
-        
-        else:
-            direction = (direction - 1) % 8
-            if direction == loop_start_dir:
-                return
+    return ''.join(map(str,max(get_chaine(img), key=len)[2:]))
 
+def compare(img1, img2):
+    c1 = freeman(img1)
+    c2 = freeman(img2)
 
-start_chain(image, start, direction)
+    dist = np.array([(c1.count(i) - c2.count(i))**2 for i in '01234567']).sum()**.5
+    return dist
 
+def compare_ci(c1, img):
+    c2 = freeman(img)
 
-
-def build_contour(idx, contour, img):
-    global dir_idx
-    x, y = idx
-
-    w, h = img.shape
-
-    arr = np.zeros((w, h))
-
-    for dir in contour:
-        arr[x, y] = 255
-        nx, ny = dir_idx[dir]
-        x += nx
-        y += ny
-        
-    Image.fromarray(arr.astype("uint8")).save("image.png")
-
-# build_contour(start_pos, contour, image)
+    dist = np.array([(c1.count(i) - c2.count(i))**2 for i in '01234567']).sum()**.5
+    return dist
