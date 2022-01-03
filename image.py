@@ -107,7 +107,7 @@ def DCT(img):
 
     for p, i in enumerate(range(0, w, dW)):
         ap = 1 / (w**.5) if p == 0 else (2/w)**.5
-        for q, j in enumerate(range(0, w, dH)):
+        for q, j in enumerate(range(0, h, dH)):
             aq = 1 / (h**.5) if q == 0 else (2/h)**.5
 
             block = img[i:i+dW,j:j+dH]
