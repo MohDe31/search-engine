@@ -57,12 +57,13 @@ def searchForImage(value: str):
         images = []
         for filename in os.listdir(assets_folder):
             file_path = os.path.join(assets_folder, filename)
-            print(file_path)
             test_img = cv2.imread(file_path)
 
             dist = compare_ci(img_freeman, test_img)
 
-            if dist <= 400:
+            print(file_path, dist)
+
+            if dist <= 110:
                 with open(file_path, 'rb') as f:
                     b64 = base64.b64encode(f.read())
                     images.append({'src': str(b64)[2:-1], 'type': 'B64', 'name': filename, 'dist': dist})
@@ -82,7 +83,7 @@ def searchForImage(value: str):
             
             dist = ((((y1-y2)**2).sum())**.5) + ((((cb1-cb2)**2).sum())**.5) + ((((cr1-cr2)**2).sum())**.5)
             print(dist)
-            if dist <= 2000:
+            if dist <= 585:
                 with open(file_path, 'rb') as f:
                     b64 = base64.b64encode(f.read())
                     images.append({'src': str(b64)[2:-1], 'type': 'B64', 'name': filename, 'dist': dist})
