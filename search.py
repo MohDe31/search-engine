@@ -1,4 +1,4 @@
-from sqlite3.dbapi2 import Connection, Cursor, connect
+from sqlite3.dbapi2 import Connection, Cursor
 from bs4 import BeautifulSoup
 from threading import Thread
 from bs4.element import Tag
@@ -12,9 +12,8 @@ import base64
 import cv2
 import os
 
-from freeman import compare, compare_ci, freeman
+from freeman import compare_ci, freeman
 from image import DCT
-from utils import isGray
 
 def save_urls(link, images): 
     db = sqlite3.connect('database.db')
@@ -51,9 +50,10 @@ def searchForImage(value: str):
     
     assets_folder = os.path.join(os.getcwd(), "assets")
 
-    if isGray(img):
+    img_freeman = freeman(img)
+    
+    if len(img_freeman) > 50:
         print("FREEMAN")
-        img_freeman = freeman(img)
         images = []
         for filename in os.listdir(assets_folder):
             file_path = os.path.join(assets_folder, filename)
@@ -83,7 +83,7 @@ def searchForImage(value: str):
             
             dist = ((((y1-y2)**2).sum())**.5) + ((((cb1-cb2)**2).sum())**.5) + ((((cr1-cr2)**2).sum())**.5)
             print(dist)
-            if dist <= 585:
+            if dist <= 670:
                 with open(file_path, 'rb') as f:
                     b64 = base64.b64encode(f.read())
                     images.append({'src': str(b64)[2:-1], 'type': 'B64', 'name': filename, 'dist': dist})

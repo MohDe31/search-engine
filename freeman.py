@@ -1,9 +1,8 @@
 from ctypes import *
 import ctypes
 import numpy as np
-from PIL import Image
 import cv2
-from numpy.ctypeslib import as_ctypes, load_library
+
 libCalc = CDLL("./utils/libdct.so")
 
 def Naif_Detector(image):
